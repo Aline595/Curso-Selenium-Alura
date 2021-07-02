@@ -5,6 +5,7 @@ import java.time.format.DateTimeFormatter;
 
 import org.junit.Assert;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import login.LoginPage;
@@ -12,7 +13,16 @@ import login.LoginPage;
 public class LeiloesTest {
 		
 	private LeiloesPage paginaDeLeiloes;
+	private CadastroLeilaoPage paginaDeCadastro;
 
+	@BeforeEach
+	public void beforeEach() {
+	    LoginPage paginaDeLogin = new LoginPage();
+	    paginaDeLogin.preencheFormularioDeLogin("fulano", "pass");
+	    this.paginaDeLeiloes = paginaDeLogin.efetuaLogin();
+	    this.paginaDeCadastro = paginaDeLeiloes.carregarFormulario();
+	}
+	
     @AfterEach
     public void afterEach(){
         this.paginaDeLeiloes.fechar();
@@ -20,17 +30,20 @@ public class LeiloesTest {
     
     @Test
     public void deveriaCadastrarLeilao() {
-        LoginPage paginaDeLogin = new LoginPage();
-        paginaDeLogin.preencheFormularioDeLogin("fulano", "pass");
-        this.paginaDeLeiloes = paginaDeLogin.efetuaLogin();
-        CadastroLeilaoPage paginaDeCadastro = paginaDeLeiloes.carregarFormulario();
-
         String hoje = LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
         String nome = "Leilao do dia " + hoje;
         String valor = "500.00";
 
         this.paginaDeLeiloes = paginaDeCadastro.cadastrarLeilao(nome, valor, hoje);
         Assert.assertTrue(paginaDeLeiloes.isLeilaoCadastrado(nome, valor, hoje));
+    }
+    
+    @Test
+    public void deveriaValidarCadastroDeLeilao() {
+        this.paginaDeLeiloes = paginaDeCadastro.cadastrarLeilao("", "", "");// NÃO PODE ENVIAR NULL, SOMENTE STRING VAZIA
 
+        Assert.assertFalse(this.paginaDeCadastro.isPaginaAtual());
+        Assert.assertTrue(this.paginaDeLeiloes.isPaginaAtual());
+        Assert.assertTrue(this.paginaDeCadastro.isPaginaDeValidacaoVisiveis());
     }
 }
