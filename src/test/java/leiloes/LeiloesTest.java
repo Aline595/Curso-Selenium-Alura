@@ -27,8 +27,7 @@ public class LeiloesTest {
     public void afterEach(){
         this.paginaDeLeiloes.fechar();
     }
-    
-    @Test
+        @Test
     public void deveriaCadastrarLeilao() {
         String hoje = LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
         String nome = "Leilao do dia " + hoje;
